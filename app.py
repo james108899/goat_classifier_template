@@ -1,17 +1,16 @@
-# app.py
 from flask import Flask, request, jsonify
+from flask_cors import CORS  # Import CORS to enable cross-origin requests
 from simple_random_model import RandomModel
 import os
 from datetime import datetime
 
-# Initialize the Flask app and model
+# Initialize the Flask app and enable CORS
 app = Flask(__name__)
+CORS(app)  # This allows all origins to access the endpoints
+
 model = RandomModel()
 
-# Define directory to save uploaded images
-UPLOAD_FOLDER = "uploaded_images"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
+# Define the /predict route
 @app.route('/predict', methods=['POST'])
 def predict():
     # Check if an image is uploaded
@@ -23,7 +22,9 @@ def predict():
 
     # Save the image to the upload directory with a timestamped name
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    image_path = os.path.join(UPLOAD_FOLDER, f"{timestamp}_{image.filename}")
+    upload_folder = "uploaded_images"
+    os.makedirs(upload_folder, exist_ok=True)
+    image_path = os.path.join(upload_folder, f"{timestamp}_{image.filename}")
     image.save(image_path)
 
     # Generate prediction using the RandomModel
